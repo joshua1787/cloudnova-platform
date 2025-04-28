@@ -3,36 +3,44 @@ name: Build and Push Backend Microservices
 on:
   push:
     branches:
-      - main
+      - develop
     paths:
       - 'app/backend/**'
 
 jobs:
-  build-backend:
+  build-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Order Service
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY_URL }}:order-service ./app/backend/order-service
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:order-service
+    - name: Build, Tag, and Push Product Service Docker image
+      run: |
+        docker build -t cloudnova-product-service ./app/backend/product-service
+        docker tag cloudnova-product-service:latest ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:product-service
+        docker push ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:product-service
 
-      - name: Build and Push Product Service
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY_URL }}:product-service ./app/backend/product-service
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:product-service
+    - name: Build, Tag, and Push Order Service Docker image
+      run: |
+        docker build -t cloudnova-order-service ./app/backend/order-service
+        docker tag cloudnova-order-service:latest ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:order-service
+        docker push ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:order-service
 
-      - name: Build and Push User Service
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY_URL }}:user-service ./app/backend/user-service
-          docker push ${{ secrets.ECR_REPOSITORY_URL }}:user-service
+    - name: Build, Tag, and Push User Service Docker image
+      run: |
+        docker build -t cloudnova-user-service ./app/backend/user-service
+        docker tag cloudnova-user-service:latest ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:user-service
+        docker push ${{ steps.login-ecr.outputs.registry }}/cloudnova-repository:user-service
 
