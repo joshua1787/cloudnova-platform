@@ -1,3 +1,8 @@
+variable "aws_region" {
+  type        = string
+  description = "AWS Region"
+}
+
 variable "project_name" {
   description = "Project Name"
   type        = string
@@ -13,8 +18,13 @@ variable "target_group_arn" {
   type        = string
 }
 
-variable "public_subnet_id" {
-  description = "Public Subnet ID for ECS"
+variable "public_subnet_id_1" {
+  description = "Public Subnet ID 1"
+  type        = string
+}
+
+variable "public_subnet_id_2" {
+  description = "Public Subnet ID 2"
   type        = string
 }
 
@@ -54,6 +64,6 @@ variable "container_port" {
 }
 
 variable "desired_count" {
-  description = "Desired number of tasks"
+  description = "Desired number of ECS tasks"
   type        = number
 }

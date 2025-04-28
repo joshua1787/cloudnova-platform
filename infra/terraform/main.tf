@@ -71,7 +71,8 @@ module "ecs" {
   source               = "./modules/ecs"
 
   project_name         = var.project_name
-  public_subnet_id     = module.vpc.public_subnet_id_1
+  public_subnet_id_1     = module.vpc.public_subnet_id_1
+  public_subnet_id_2   = module.vpc.public_subnet_id_2
   ecs_service_sg_id    = module.security.ecs_sg_id
   target_group_arn     = module.alb.target_group_arn
   task_cpu             = var.task_cpu
@@ -90,4 +91,11 @@ module "s3" {
 
   project_name  = var.project_name
   bucket_suffix = var.bucket_suffix
+}
+
+
+module "cloudwatch_dashboard" {
+  source       = "../../modules/cloudwatch"
+  project_name = var.project_name
+  aws_region   = var.aws_region
 }

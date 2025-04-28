@@ -1,18 +1,22 @@
-# Terraform
-*.tfstate
-*.tfstate.backup
+# Ignore Terraform local files
 .terraform/
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+*.tfplan
 
-# Node
+# Ignore binaries
+*.bin
+*.exe
+*.dll
+
+# Node, Python, other common ignores (optional)
 node_modules/
-build/
+__pycache__/
+*.pyc
 
-# OS
-.DS_Store
-
-# Logs
-*.log
-
-# Misc
-.env
+echo ".terraform/" >> .gitignore
+echo "terraform.tfstate" >> .gitignore
+echo "terraform.tfstate.backup" >> .gitignore
+echo "crash.log" >> .gitignore
 
