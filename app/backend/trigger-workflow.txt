@@ -1,0 +1,12 @@
+# Step 1: Create a dummy file inside app/backend
+touch app/backend/dummy-trigger.txt
+
+# Step 2: Add the file
+git add app/backend/dummy-trigger.txt
+
+# Step 3: Commit the change
+git commit -m "Trigger backend workflow"
+
+# Step 4: Push to GitHub
+git push origin develop
+
