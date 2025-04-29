@@ -86,3 +86,4 @@ variable "master_password" {
 variable "bucket_suffix" {
   default = "cloudnova-frontend-joshuaveeraiah1245"
 }
+

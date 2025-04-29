@@ -12,10 +12,10 @@ provider "aws" {
   region = var.aws_region
 }
 
-# VPC Module
+# Call VPC Module
 module "vpc" {
   source = "./modules/vpc"
-  
+
   project_name          = var.project_name
   vpc_cidr              = var.vpc_cidr
   public_subnet_cidr_1  = var.public_subnet_cidr_1
@@ -26,35 +26,35 @@ module "vpc" {
   availability_zone_2   = var.availability_zone_2
 }
 
-# Security Group Module
+# Call Security Module
 module "security" {
   source = "./modules/security"
 
-  project_name = var.project_name
-  vpc_id       = module.vpc.vpc_id
+  project_name   = var.project_name
+  vpc_id         = module.vpc.vpc_id
   container_port = var.container_port
 }
 
-# ALB Module
+# Call ALB Module
 module "alb" {
   source = "./modules/alb"
 
   project_name      = var.project_name
   vpc_id            = module.vpc.vpc_id
-  public_subnet_ids =  [module.vpc.public_subnet_id_1, module.vpc.public_subnet_id_2]
+  public_subnet_ids = [module.vpc.public_subnet_id_1, module.vpc.public_subnet_id_2]
   alb_sg_id         = module.security.alb_sg_id
   target_port       = var.container_port
   listener_port     = 80
 }
 
-# ECR Module
+# Call ECR Module
 module "ecr" {
   source = "./modules/ecr"
-  
+
   project_name = var.project_name
 }
 
-# RDS Module
+# Call RDS Module
 module "rds" {
   source = "./modules/rds"
 
@@ -66,13 +66,14 @@ module "rds" {
   master_password     = var.master_password
 }
 
-# ECS Module
+# Call ECS Module (Fix here properly!)
 module "ecs" {
-  source               = "./modules/ecs"
+  source = "./modules/ecs"
 
   project_name         = var.project_name
+  aws_region           = var.aws_region
   public_subnet_id_1     = module.vpc.public_subnet_id_1
-  public_subnet_id_2   = module.vpc.public_subnet_id_2
+  public_subnet_id_2    = module.vpc.public_subnet_id_2
   ecs_service_sg_id    = module.security.ecs_sg_id
   target_group_arn     = module.alb.target_group_arn
   task_cpu             = var.task_cpu
@@ -85,7 +86,7 @@ module "ecs" {
   desired_count        = var.desired_count
 }
 
-# S3 Module
+# Call S3 Module
 module "s3" {
   source = "./modules/s3"
 
@@ -93,9 +94,10 @@ module "s3" {
   bucket_suffix = var.bucket_suffix
 }
 
-
-module "cloudwatch_dashboard" {
-  source       = "../../modules/cloudwatch"
-  project_name = var.project_name
-  aws_region   = var.aws_region
+# Call CloudWatch Module (for alarms)
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+  aws_region = var.aws_region
+  project_name     = var.project_name
+  ecs_cluster_name = module.ecs.ecs_cluster_name
 }

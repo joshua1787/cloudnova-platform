@@ -1,3 +1,5 @@
+
+
 resource "aws_cloudwatch_log_group" "ecs_logs" {
   name              = "/ecs/${var.project_name}"
   retention_in_days = 7
@@ -11,7 +13,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
     Statement = [{
       Action = "sts:AssumeRole",
       Principal = {
-        Service = "ecs-tasks.amazonaws.com"   # ✅ CORRECT FIX: Added "=" sign
+        Service = "ecs-tasks.amazonaws.com"
       },
       Effect = "Allow",
       Sid    = ""
@@ -27,6 +29,31 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
 resource "aws_iam_role_policy_attachment" "ecs_logs_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+# === New Addition === #
+resource "aws_iam_role_policy" "ecs_secrets_policy" {
+  name = "${var.project_name}-secrets-access-policy"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+# ==================== #
+
+resource "aws_ecs_cluster" "this" {
+  name = "${var.project_name}-cluster"
 }
 
 resource "aws_ecs_task_definition" "this" {
@@ -81,8 +108,4 @@ resource "aws_ecs_service" "this" {
     container_name   = var.container_name
     container_port   = var.container_port
   }
-}
-
-resource "aws_ecs_cluster" "this" {
-  name = "${var.project_name}-cluster"
 }
