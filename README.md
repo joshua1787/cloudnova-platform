@@ -1,139 +1,134 @@
-CloudNova - Cloud-Native E-commerce Platform
+# CloudNova - Cloud Native Microservices Platform
 
-(Optional: Add a banner later if you want.)
+## Overview
+CloudNova is a modern **cloud-native microservices application** built on AWS. It implements end-to-end DevOps practices including CI/CD, Blue-Green deployment, centralized logging, security hardening, disaster recovery, and observability.
 
-🚀 Project Overview
-CloudNova is a fully serverless, containerized, production-ready e-commerce platform built on AWS Cloud, designed to demonstrate real-world DevOps, Cloud, and Microservices architecture practices.
+---
 
-Built for:
+## 🚀 Project Architecture
 
-High Availability
+![CloudNova Architecture](./architecture/CloudNova-Architecture.png)
 
-Scalability
+### Core Components:
+- **Frontend:** React App (deployed to S3 + CloudFront)
+- **Backend:** GoLang Microservices (Order, Product, User services)
+- **Infrastructure:** ECS Fargate, ALB, VPC, Security Groups, Subnets
+- **CI/CD:** GitHub Actions
+- **Monitoring:** FluentBit, CloudWatch Logs, Metrics, Alarms
+- **Security:** AWS Inspector, GuardDuty, Secrets Manager
+- **Resilience:** Auto-recovery Alarms, Multi-AZ Deployment
 
-Resilience
+---
 
-Cost Efficiency
+## 📦 Tools and Technologies
 
-🛠️ Tech Stack
+| Layer                  | Tools Used                                                                 |
+|------------------------|----------------------------------------------------------------------------|
+| Source Control         | GitHub                                                                    |
+| CI/CD                  | GitHub Actions, ECR                                                       |
+| Compute                | ECS Fargate                                                               |
+| Networking             | VPC, Public and Private Subnets, NAT Gateway, ALB                        |
+| Observability          | FluentBit, CloudWatch Logs, CloudWatch Metrics, CloudWatch Alarms         |
+| Security               | AWS Inspector, GuardDuty, Secrets Manager, IAM, Security Groups          |
+| Storage                | S3 (Frontend Hosting)                                                     |
+| Monitoring             | CloudWatch Container Insights, Log Metric Filters                        |
+| Disaster Recovery      | Multi-AZ, Alarm-based AutoRecovery, IAM Role Separation                   |
 
-Layer	Technologies
-Frontend	ReactJS (Hosted on S3 Static Website)
-Backend	GoLang Microservices (Order, Product, User)
-Database	AWS Aurora Serverless (MySQL)
-Messaging	SQS + SNS + EventBridge
-Infrastructure	Terraform
-Containers	Docker + ECS Fargate
-CI/CD	GitHub Actions + AWS CodePipeline
-Monitoring	CloudWatch, FluentBit, Prometheus (future)
-Secrets Management	AWS Secrets Manager
-Security	AWS WAF + Shield Standard
-⚡ Key Features
-Microservices-based backend (User Service, Product Service, Order Service)
+---
 
-Fully serverless frontend hosting (React App on S3)
+## 🔥 Project Modules
 
-AWS Elastic Load Balancer (ALB) integrated with ECS services
+### Frontend (ReactJS)
+- Built using React
+- Hosted on S3 bucket configured for static website hosting
+- Deployed via GitHub Actions
 
-Real-time monitoring and alerts using CloudWatch Metrics and Alarms
+### Backend (Go Microservices)
+- Microservices: `order-service`, `product-service`, `user-service`
+- Containerized and pushed to AWS ECR
+- Deployed via Terraform to ECS Fargate
 
-Secure secret management using AWS Secrets Manager
+### Infrastructure (Terraform)
+- Modular structure:
+  - `vpc/`
+  - `alb/`
+  - `ecs/`
+  - `rds/`
+  - `security/`
+  - `s3/`
+  - `cloudwatch/`
 
-Scalable infrastructure provisioned through Terraform modules
+---
 
-Zero downtime deployments with Blue-Green strategy
+## 🛠️ Deployment Flow
 
-GitOps CI/CD Pipelines with GitHub Actions
+```mermaid
+flowchart TD
+    A[Code Push to GitHub] -->|Triggers| B[GitHub Actions Workflow]
+    B --> C[Docker Build Backend Services]
+    C --> D[Push Images to AWS ECR]
+    D --> E[Terraform Plan and Apply]
+    E --> F[Deploy ECS Services]
+    F --> G[Expose via ALB]
+    G --> H[S3 Frontend Deployment]
+    H --> I[CloudFront Distribution Setup]
+```
 
-⚙️ Architecture Diagram
-(You can insert your architecture diagram here once ready!)
+---
 
-🧱 Project Structure
-bash
-Copy
-Edit
-CloudNova/
-├── app/
-│   ├── backend/     # GoLang Microservices
-│   └── frontend/    # React Frontend
-├── infra/
-│   └── terraform/   # Terraform Modules for AWS Resources
-├── ci-cd/
-│   └── github-actions/ # GitHub Actions YAMLs
-├── docs/
-│   └── rca/         # Incident RCA Reports
-├── README.md
-🔥 How to Deploy
-Clone the Repository
+## 🛡️ Security Enhancements
+- **IAM Role Separation** for ECS tasks
+- **Secrets Manager** for DB Credentials
+- **Inspector Scans** scheduled
+- **GuardDuty Enabled** for Threat Detection
+- **Security Groups** with Least Privilege
+- **CloudTrail Logging** enabled
 
-bash
-Copy
-Edit
-git clone https://github.com/<your-username>/cloudnova-platform.git
-cd cloudnova-platform
-Infrastructure Deployment (Terraform)
+---
 
-bash
-Copy
-Edit
-cd infra/terraform
-terraform init
-terraform plan
-terraform apply
-Backend Microservices
+## 📊 Monitoring and Observability
+- **FluentBit Sidecar** for shipping container logs
+- **Custom CloudWatch Log Metric Filters** (e.g., 5xx errors)
+- **CloudWatch Alarms** auto-scaling and alerting
+- **CloudWatch Container Insights** enabled
 
-bash
-Copy
-Edit
-cd app/backend/
-docker build -t order-service .
-docker push <your-ecr-repo-url>:order-service
-# Repeat for user-service, product-service
-Frontend Deployment
+---
 
-bash
-Copy
-Edit
-cd app/frontend/react-app/
-npm install
-npm run build
-aws s3 sync build/ s3://<your-bucket-name> --delete
-View Frontend Access via S3 Website URL or CloudFront.
+## 📃 RCA (Root Cause Analysis) Template Example
 
-Monitor & Maintain Use CloudWatch, ECS Console, and FluentBit logs for monitoring!
+| Category        | Details |
+|-----------------|---------|
+| **Incident Date**| 2025-04-29 |
+| **Impact**       | Order-Service crash caused 5xx responses |
+| **Root Cause**   | ECS Task out-of-memory due to increased load |
+| **Resolution**   | Increased ECS Task memory, applied autoscaling |
+| **Action Items** | Configure CloudWatch memory alarms proactively |
 
-📊 Observability Features
-ECS CPU and Memory Usage Alarms
+---
 
-Container Logs forwarded using FluentBit
+## 📌 Final Deliverables
+- Full Terraform Infrastructure as Code
+- GitHub Actions CI/CD Pipelines
+- ECR Repositories with containerized services
+- ECS Blue-Green Deployment Enabled
+- Real-time FluentBit logging integrated
+- CloudWatch Monitoring, Alarming, RCA templates
+- End-to-End AWS-based microservices platform
 
-RDS Failover Testing
+---
 
-S3 Access Logging
+## 👨‍💻 Project Author
 
-Distributed Tracing (Planned with AWS X-Ray)
+**Joshua Veeraiah**
+- AWS Certified DevOps Engineer - Professional
+- Passionate about building resilient and production-ready cloud applications.
 
-📑 RCA (Root Cause Analysis) Reports
+> _"CloudNova - Designed to reflect real-world AWS DevOps Engineering skills!"_
 
-Date	Incident	Status
-2025-04-29	ECS Task Crash	Resolved
-2025-04-27	S3 Website Downtime	Resolved
-2025-04-26	RDS Cluster Failover	Auto-Handled
-Check docs/rca/ for detailed incident handling examples.
+---
 
-✨ Future Enhancements
-Implement AWS CloudFront for Frontend CDN
+# Thank You!
 
-Full Grafana + Prometheus Monitoring Setup
+---
 
-Blue-Green or Canary Deployment Strategy via CodeDeploy
-
-Cross-Region Disaster Recovery Setup
-
-🧑‍💻 Author
-Joshua Veeraiah
-AWS Certified DevOps Engineer | Cloud Enthusiast | DevOps Specialist
-
-⭐ Why This Project?
-This project simulates real-world cloud-native architectures at scale, preparing me for DevOps, Cloud Engineer, and Site Reliability Engineer (SRE) roles.
-
+> **Note:** _This project is structured to simulate an enterprise-grade AWS microservices deployment and is fully portfolio-ready for job applications._
